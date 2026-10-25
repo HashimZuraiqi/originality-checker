@@ -1,0 +1,121 @@
+{
+  "documents": 60,
+  "sources": 50,
+  "source_words": 90943,
+  "lexical": {
+    "recall_by_type": {
+      "exact": 1.0,
+      "near_exact": 1.0,
+      "paraphrase": 0.042,
+      "paraphrase_paragraph": 0.567,
+      "quoted_cited": 1.0
+    },
+    "counts_by_type": {
+      "exact": 24,
+      "near_exact": 24,
+      "paraphrase": 24,
+      "paraphrase_paragraph": 30,
+      "quoted_cited": 12
+    },
+    "passage_precision": 0.904,
+    "passage_recall": 0.647,
+    "false_positive_rate_original_text": 0.008,
+    "false_positive_rate_topical_non_paraphrase": 0.1,
+    "topical_non_paraphrase_detail": {
+      "n": 60,
+      "semantic_flag": 4,
+      "exact_flag": 18,
+      "exact_flag_with_true_verbatim_run": 15,
+      "verbatim_runs_present": 15
+    },
+    "multi_sentence_negative_detail": {
+      "n": 30,
+      "semantic_strong_flag": 2,
+      "semantic_any_flag": 15
+    },
+    "semantic_flags_by_strength": {
+      "strong": {
+        "tp": 3,
+        "fp": 2,
+        "precision": 0.6
+      },
+      "moderate": {
+        "tp": 15,
+        "fp": 19,
+        "precision": 0.441
+      }
+    },
+    "false_flags_counted_in_index": 4,
+    "exact_span_iou_mean": 0.905,
+    "similarity_index_mean_abs_error_pct_points": 7.65,
+    "similarity_index_mae_docs_without_mrpc_verbatim_runs": {
+      "mae": 0.82,
+      "docs": 6
+    },
+    "default_view_weak_signals_hidden": {
+      "passage_precision": 0.895,
+      "false_positive_rate_original_text": 0.008,
+      "false_positive_rate_topical_negatives": 0.056
+    },
+    "seconds_per_document_mean": 3.827,
+    "process_peak_rss_mb": 414.9
+  },
+  "wordvec": {
+    "recall_by_type": {
+      "exact": 1.0,
+      "near_exact": 1.0,
+      "paraphrase": 0.333,
+      "paraphrase_paragraph": 0.667,
+      "quoted_cited": 1.0
+    },
+    "counts_by_type": {
+      "exact": 24,
+      "near_exact": 24,
+      "paraphrase": 24,
+      "paraphrase_paragraph": 30,
+      "quoted_cited": 12
+    },
+    "passage_precision": 0.768,
+    "passage_recall": 0.745,
+    "false_positive_rate_original_text": 0.083,
+    "false_positive_rate_topical_non_paraphrase": 0.217,
+    "topical_non_paraphrase_detail": {
+      "n": 60,
+      "semantic_flag": 10,
+      "exact_flag": 18,
+      "exact_flag_with_true_verbatim_run": 15,
+      "verbatim_runs_present": 15
+    },
+    "multi_sentence_negative_detail": {
+      "n": 30,
+      "semantic_strong_flag": 3,
+      "semantic_any_flag": 19
+    },
+    "semantic_flags_by_strength": {
+      "strong": {
+        "tp": 5,
+        "fp": 4,
+        "precision": 0.556
+      },
+      "moderate": {
+        "tp": 23,
+        "fp": 40,
+        "precision": 0.365
+      }
+    },
+    "false_flags_counted_in_index": 4,
+    "exact_span_iou_mean": 0.905,
+    "similarity_index_mean_abs_error_pct_points": 7.65,
+    "similarity_index_mae_docs_without_mrpc_verbatim_runs": {
+      "mae": 0.82,
+      "docs": 6
+    },
+    "default_view_weak_signals_hidden": {
+      "passage_precision": 0.883,
+      "false_positive_rate_original_text": 0.008,
+      "false_positive_rate_topical_negatives": 0.067
+    },
+    "seconds_per_document_mean": 2.579,
+    "process_peak_rss_mb": 412.5
+  }
+}

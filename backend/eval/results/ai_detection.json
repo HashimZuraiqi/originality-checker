@@ -1,20 +1,20 @@
 {
   "thresholds": {
-    "low": 0.4,
-    "high": 0.793
+    "low": 0.303,
+    "high": 0.782
   },
   "cross_validation": {
     "all": {
       "n": 554,
-      "precision_many": 0.87,
-      "recall_many": 0.859,
-      "f1_many": 0.865,
+      "precision_many": 0.868,
+      "recall_many": 0.846,
+      "f1_many": 0.857,
       "false_positive_rate_many": 0.021,
-      "human_marked_few": 0.903,
-      "ai_marked_few": 0.051,
-      "inconclusive_rate": 0.078,
-      "auc": 0.982,
-      "ece": 0.075
+      "human_marked_few": 0.878,
+      "ai_marked_few": 0.064,
+      "inconclusive_rate": 0.099,
+      "auc": 0.977,
+      "ece": 0.071
     },
     "academic": {
       "n": 236,
@@ -22,29 +22,29 @@
       "recall_many": 0.875,
       "f1_many": 0.84,
       "false_positive_rate_many": 0.024,
-      "human_marked_few": 0.873,
-      "ai_marked_few": 0.0,
-      "inconclusive_rate": 0.106,
-      "auc": 0.99,
-      "ece": 0.117
+      "human_marked_few": 0.83,
+      "ai_marked_few": 0.042,
+      "inconclusive_rate": 0.14,
+      "auc": 0.985,
+      "ece": 0.111
     },
     "news": {
       "n": 44,
       "note": "single-class subset; only detection rate is meaningful",
       "marked_many": 0.091,
-      "marked_few": 0.727
+      "marked_few": 0.682
     },
     "student_essay": {
       "n": 190,
-      "precision_many": 0.964,
-      "recall_many": 0.9,
-      "f1_many": 0.931,
+      "precision_many": 0.963,
+      "recall_many": 0.867,
+      "f1_many": 0.912,
       "false_positive_rate_many": 0.006,
-      "human_marked_few": 0.956,
+      "human_marked_few": 0.95,
       "ai_marked_few": 0.0,
-      "inconclusive_rate": 0.047,
-      "auc": 0.997,
-      "ece": 0.037
+      "inconclusive_rate": 0.058,
+      "auc": 0.994,
+      "ece": 0.036
     },
     "technical": {
       "n": 84,
@@ -55,8 +55,8 @@
       "human_marked_few": 1.0,
       "ai_marked_few": 0.167,
       "inconclusive_rate": 0.012,
-      "auc": 0.995,
-      "ece": 0.047
+      "auc": 0.994,
+      "ece": 0.054
     }
   },
   "non_native_by_proficiency": {
@@ -68,7 +68,7 @@
     "middle (2.5-3.5)": {
       "n": 95,
       "false_positive_rate_many": 0.0,
-      "marked_few": 0.979
+      "marked_few": 0.968
     },
     "higher (>=3.5)": {
       "n": 57,
@@ -83,7 +83,7 @@
   },
   "ai_student_essay_persona_voice": {
     "n": 15,
-    "recall_many": 0.8,
+    "recall_many": 0.733,
     "marked_few": 0.0
   },
   "features_dropped_by_sign_constraint": [
@@ -92,9 +92,9 @@
   ],
   "robustness_ai_edited": {
     "n": 78,
-    "marked_many": 0.782,
-    "inconclusive": 0.167,
-    "marked_few": 0.051,
+    "marked_many": 0.821,
+    "inconclusive": 0.141,
+    "marked_few": 0.038,
     "note": "scored by the final model trained on unedited data (optimistic for in-distribution AI text)"
   },
   "robustness_mixed": {

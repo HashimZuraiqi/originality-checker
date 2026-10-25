@@ -1,0 +1,73 @@
+{
+  "embedding_provider": "wordvec",
+  "extraction": {
+    "pdf_20_pages": {
+      "bytes": 50259,
+      "words": 9035,
+      "seconds": 0.447
+    },
+    "pdf_100_pages": {
+      "bytes": 240842,
+      "words": 45017,
+      "seconds": 3.483
+    },
+    "docx_10k_words": {
+      "bytes": 60747,
+      "words": 10014,
+      "seconds": 0.178
+    }
+  },
+  "pipeline": {
+    "1000_words": {
+      "upload_request_seconds": 0.027,
+      "stage_seconds": {
+        "extract": 0.006,
+        "segment": 0.008,
+        "language": 0.412,
+        "citations": 0.007,
+        "discover": 0.16,
+        "compare": 1.382,
+        "ai": 0.047,
+        "quality": 0.038
+      },
+      "total_seconds": 2.06
+    },
+    "5000_words": {
+      "upload_request_seconds": 0.03,
+      "stage_seconds": {
+        "extract": 0.005,
+        "segment": 0.028,
+        "language": 0.027,
+        "citations": 0.007,
+        "discover": 0.047,
+        "compare": 0.542,
+        "ai": 0.251,
+        "quality": 0.064
+      },
+      "total_seconds": 0.97
+    },
+    "20000_words": {
+      "upload_request_seconds": 0.104,
+      "stage_seconds": {
+        "extract": 0.008,
+        "segment": 0.101,
+        "language": 0.047,
+        "citations": 0.025,
+        "discover": 0.221,
+        "compare": 0.715,
+        "ai": 4.603,
+        "quality": 0.596
+      },
+      "total_seconds": 6.32
+    }
+  },
+  "concurrency": {
+    "jobs": 6,
+    "worker_threads": 2,
+    "words_each": 3000,
+    "wall_seconds": 7.55,
+    "jobs_per_minute": 47.7,
+    "all_completed": true
+  },
+  "peak_rss_mb": 368.3
+}

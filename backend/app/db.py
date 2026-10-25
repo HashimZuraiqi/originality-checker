@@ -49,10 +49,23 @@ def get_engine() -> Engine:
     return _engine or init_engine()
 
 
-def create_all() -> None:
+def create_all(attempts: int = 5) -> None:
+    """Create missing tables. The API and worker containers may start at the
+    same time, so a collision with the other process is retried."""
+    import time
+
+    from sqlalchemy.exc import IntegrityError, OperationalError, ProgrammingError
+
     from . import models  # noqa: F401  (register tables)
 
-    Base.metadata.create_all(get_engine())
+    for attempt in range(attempts):
+        try:
+            Base.metadata.create_all(get_engine())
+            return
+        except (IntegrityError, ProgrammingError, OperationalError):
+            if attempt == attempts - 1:
+                raise
+            time.sleep(1 + attempt)
 
 
 @contextmanager

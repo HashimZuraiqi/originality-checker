@@ -8,9 +8,12 @@ Scoring is deliberately simple so every number can be recomputed by hand:
   Correctly quoted *and* cited text, and reference-list overlap, are shown
   but not counted.
 * unattributed_pct = the subset with no quotation marks and no citation.
-* semantic_pct = words in sentences flagged as possible paraphrase. It is
-  reported separately because semantic similarity is probabilistic
-  evidence, not proof of copying.
+* semantic_pct = words in passages with *strong* paraphrase evidence (several
+  consecutive sentences aligned with one source, or near-identical meaning).
+  It is reported separately because semantic similarity is probabilistic
+  evidence, not proof of copying. Single sentences with only moderate
+  similarity are kept as "weak signals" (weak_semantic_pct): the benchmark in
+  eval/ showed they are often merely topical.
 * quoted_pct = words in quoted-and-cited matches (informational).
 
 Each document word is attributed to at most one source (the source with the
@@ -206,16 +209,21 @@ def analyze_similarity(
     unattributed_words = 0
     quoted_words = 0
     semantic_words = 0
+    weak_semantic_words = 0
     per_source: dict[str, dict] = defaultdict(lambda: {"words": 0, "semantic_words": 0, "matches": 0, "categories": defaultdict(int)})
     provider_label = provider.label if provider else None
 
     for p in exact + semantic:
         src = by_id[p.source_id]
         cited = citations.has_citation_near(p.start, p.end, sentences)
+        weak = p.method == "semantic" and p.evidence.get("strength") != "strong"
         if p.method == "semantic":
             category = "paraphrase_cited" if cited else "paraphrase"
-            semantic_words += p.words
-            per_source[p.source_id]["semantic_words"] += p.words
+            if weak:
+                weak_semantic_words += p.words
+            else:
+                semantic_words += p.words
+                per_source[p.source_id]["semantic_words"] += p.words
         elif citations.in_bibliography(p.start):
             category = "bibliography"
         elif citations.quoted_fraction(p.start, p.end) >= 0.8:
@@ -238,9 +246,13 @@ def analyze_similarity(
         severity, label = CATEGORY_INFO[category]
         if category == "unattributed" and p.words < 15:
             severity = "medium"
-        if category == "paraphrase" and p.evidence.get("strength") != "strong":
-            severity = "low"
         how, steps = _explain(category, p, src, provider_label)
+        if weak:
+            severity, label = "info", "Weak paraphrase signal"
+            how += (
+                " This is weak evidence: a single sentence with moderate similarity. In testing, matches like this were"
+                " often sentences on the same topic rather than paraphrases."
+            )
         per_source[p.source_id]["matches"] += 1
         per_source[p.source_id]["categories"][category] += 1
         findings.append(
@@ -258,6 +270,7 @@ def analyze_similarity(
                 "source_excerpt": p.source_excerpt,
                 "citation_detected": cited,
                 "counts_toward_index": counts,
+                "weak": weak,
                 "explanation": how,
                 "next_steps": steps,
                 "evidence": p.evidence,
@@ -293,6 +306,7 @@ def analyze_similarity(
             "similarity_index": pct(counted_words),
             "unattributed_pct": pct(unattributed_words),
             "semantic_pct": pct(semantic_words),
+            "weak_semantic_pct": pct(weak_semantic_words),
             "quoted_pct": pct(quoted_words),
             "total_words": total_words,
             "countable_words": countable,

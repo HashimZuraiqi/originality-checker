@@ -45,6 +45,7 @@ export default function ReportPage() {
   const [groups, setGroups] = useState<Record<FindingGroup, boolean>>({ exact: true, paraphrase: true, citation: true, ai: true, ok: false, quality: false });
   const [sourceFilter, setSourceFilter] = useState("");
   const [minSeverity, setMinSeverity] = useState<"all" | "medium">("all");
+  const [showWeak, setShowWeak] = useState(false);
   const [selected, setSelected] = useState<Finding | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -72,18 +73,20 @@ export default function ReportPage() {
 
   const counts = useMemo(() => {
     const c: Record<FindingGroup, number> = { exact: 0, paraphrase: 0, citation: 0, ai: 0, ok: 0, quality: 0 };
-    for (const f of allFindings) c[groupOf(f)]++;
+    for (const f of allFindings) if (!(f.kind === "similarity" && f.weak)) c[groupOf(f)]++;
     return c;
   }, [allFindings]);
+  const weakCount = useMemo(() => allFindings.filter((f) => f.kind === "similarity" && f.weak).length, [allFindings]);
 
   const visible = useMemo(
     () =>
       allFindings
         .filter((f) => groups[groupOf(f)])
+        .filter((f) => showWeak || !(f.kind === "similarity" && f.weak))
         .filter((f) => !sourceFilter || (f.kind === "similarity" && f.source_id === sourceFilter))
         .filter((f) => minSeverity === "all" || SEVERITY_RANK[f.severity] <= SEVERITY_RANK.medium)
         .sort((a, b) => a.start - b.start || SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]),
-    [allFindings, groups, sourceFilter, minSeverity],
+    [allFindings, groups, sourceFilter, minSeverity, showWeak],
   );
 
   const sourceRank = useMemo(() => Object.fromEntries((report?.similarity.sources ?? []).map((s) => [s.id, s.rank])), [report]);
@@ -212,7 +215,10 @@ export default function ReportPage() {
         <Card className="p-5">
           <p className="text-sm font-semibold">Possible paraphrase</p>
           <p className={cx("mt-2 text-3xl font-bold tabular-nums", TONE_TEXT[s.semantic_pct > 15 ? "orange" : s.semantic_pct > 0 ? "amber" : "emerald"])}>{s.semantic_pct}%</p>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">of words in sentences semantically close to a source. Reported separately; review in context.</p>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">of words in passages with strong paraphrase evidence. Reported separately; review in context.</p>
+          {(report.similarity.scores.weak_semantic_pct ?? 0) > 0 && (
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">+{report.similarity.scores.weak_semantic_pct}% weak single-sentence signals (hidden by default)</p>
+          )}
           {report.similarity.method.semantic_provider?.degraded && <Badge tone="amber" className="mt-2">Degraded: lexical fallback</Badge>}
         </Card>
         <Card className="p-5">
@@ -271,6 +277,19 @@ export default function ReportPage() {
                   <span className="text-slate-400">{counts[g]}</span>
                 </button>
               ))}
+              {weakCount > 0 && (
+                <button
+                  aria-pressed={showWeak}
+                  onClick={() => setShowWeak(!showWeak)}
+                  className={cx(
+                    "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset transition",
+                    showWeak ? "bg-white ring-slate-300 dark:bg-slate-800 dark:ring-slate-600" : "text-slate-400 ring-slate-200 dark:ring-slate-800",
+                  )}
+                  title="Single sentences with moderate semantic similarity. Often topical rather than paraphrased; hidden by default."
+                >
+                  Weak semantic signals <span className="text-slate-400">{weakCount}</span>
+                </button>
+              )}
               <div className="ml-auto flex items-center gap-2">
                 <Select aria-label="Filter by source" value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)} className="h-8 w-40 py-1 text-xs">
                   <option value="">All sources</option>

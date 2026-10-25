@@ -2,6 +2,7 @@
 
 import json
 import os
+import time
 from functools import lru_cache
 from pathlib import Path
 
@@ -20,13 +21,18 @@ def _fernet() -> Fernet:
         # Development convenience: create and persist a key next to the data.
         key_file = Path(settings.storage_dir).parent / "encryption.key"
         key_file.parent.mkdir(parents=True, exist_ok=True)
-        if key_file.exists():
-            key = key_file.read_text().strip()
-        else:
+        try:
             key = Fernet.generate_key().decode()
             fd = os.open(key_file, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
             with os.fdopen(fd, "w") as f:
                 f.write(key)
+        except FileExistsError:
+            # Already created (possibly a moment ago by another process).
+            for _ in range(50):
+                key = key_file.read_text().strip()
+                if key:
+                    break
+                time.sleep(0.1)
     return Fernet(key.encode() if isinstance(key, str) else key)
 
 

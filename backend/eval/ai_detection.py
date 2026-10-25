@@ -246,7 +246,7 @@ def cross_validate(rows: list[dict], X: np.ndarray, folds: int = 5, seed: int = 
     strata = [f"{r['label']}-{r['genre']}" for r in rows]
     rng = random.Random(seed)
     fold_of = np.zeros(len(rows), dtype=int)
-    for s in set(strata):
+    for s in sorted(set(strata)):  # sorted: set order varies with hash randomisation
         idx = [i for i, st in enumerate(strata) if st == s]
         rng.shuffle(idx)
         for k, i in enumerate(idx):

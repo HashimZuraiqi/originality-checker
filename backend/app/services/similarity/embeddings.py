@@ -15,9 +15,13 @@ not care which one runs:
                 available, and the report then says semantic analysis ran in
                 degraded mode.
 
-Thresholds differ by provider because the score distributions differ; the
-values below come from the paraphrase benchmark in eval/ (see
-docs/EVALUATION.md) and can be overridden.
+Thresholds differ by provider because the score distributions differ.
+``lexical`` and ``wordvec`` thresholds were calibrated on the MRPC train
+split by eval/similarity.py --calibrate (results in
+eval/results/paraphrase_calibration.json). The ``sbert`` values are starting
+points that could not be calibrated in the development sandbox (no access to
+the model weights); run the same command where the model is available and
+update them.
 """
 
 import json
@@ -25,6 +29,7 @@ import logging
 import math
 import re
 import threading
+import zlib
 from collections import Counter
 from pathlib import Path
 
@@ -35,7 +40,8 @@ from ..text import STOPWORDS, normalize_word
 
 log = logging.getLogger(__name__)
 
-WORDVEC_DIR = BASE_DIR / "data" / "models" / "wordvec"
+# Outside data/ so a runtime volume mounted on data/ does not hide it.
+WORDVEC_DIR = BASE_DIR / "models" / "wordvec"
 
 
 def l2_normalize(m: np.ndarray) -> np.ndarray:
@@ -66,7 +72,7 @@ class EmbeddingProvider:
 
 class SbertProvider(EmbeddingProvider):
     name = "sbert"
-    paraphrase_threshold = 0.78
+    paraphrase_threshold = 0.78  # uncalibrated starting point, see module docstring
     strong_threshold = 0.88
 
     def __init__(self, model_name: str, model=None):
@@ -88,12 +94,12 @@ class SbertProvider(EmbeddingProvider):
 class WordVecProvider(EmbeddingProvider):
     name = "wordvec"
     label = "SIF-weighted word vectors (spaCy en_core_web_md)"
-    paraphrase_threshold = 0.86
-    strong_threshold = 0.93
+    paraphrase_threshold = 0.91  # MRPC-calibrated (F0.5 on train)
+    strong_threshold = 0.98  # MRPC train precision >= 0.95
     _SIF_A = 1e-3
 
     def __init__(self, vectors: np.ndarray, vocab: dict[str, int]):
-        self._vectors = vectors
+        self._vectors = np.asarray(vectors, dtype=np.float32)
         self._vocab = vocab
         try:
             from wordfreq import word_frequency
@@ -101,6 +107,9 @@ class WordVecProvider(EmbeddingProvider):
             self._freq = lambda w: word_frequency(w, "en")
         except ImportError:  # pragma: no cover - wordfreq is a hard dependency
             self._freq = lambda w: 1e-5
+        # word -> (row, SIF weight); filled lazily because computing weights
+        # for the whole 250k-word vocabulary up front is slow and mostly unused.
+        self._cache: dict[str, tuple[int, float] | None] = {}
 
     @classmethod
     def load(cls, directory: Path = WORDVEC_DIR) -> "WordVecProvider":
@@ -108,27 +117,36 @@ class WordVecProvider(EmbeddingProvider):
         vocab_file = directory / "vocab.json"
         if not vectors_file.exists():
             build_wordvec_files(directory)
-        vectors = np.load(vectors_file, mmap_mode="r")
+        vectors = np.load(vectors_file)
         vocab = json.loads(vocab_file.read_text())
         return cls(vectors, vocab)
 
-    def _sentence_vector(self, text: str) -> np.ndarray:
-        acc = np.zeros(self._vectors.shape[1], dtype=np.float32)
-        total = 0.0
-        for m in re.finditer(r"[^\W\d_]+(?:'[^\W\d_]+)?", text):
-            w = normalize_word(m.group())
-            row = self._vocab.get(w)
-            if row is None:
-                continue
-            weight = self._SIF_A / (self._SIF_A + self._freq(w))
-            acc += weight * self._vectors[row]
-            total += weight
-        return acc / total if total else acc
+    def _lookup(self, w: str) -> tuple[int, float] | None:
+        hit = self._cache.get(w, False)
+        if hit is not False:
+            return hit  # type: ignore[return-value]
+        row = self._vocab.get(w)
+        val = None if row is None else (row, self._SIF_A / (self._SIF_A + self._freq(w)))
+        if len(self._cache) < 500_000:
+            self._cache[w] = val
+        return val
 
     def encode(self, texts: list[str]) -> np.ndarray:
+        dim = self._vectors.shape[1]
         if not texts:
-            return np.zeros((0, self._vectors.shape[1]), dtype=np.float32)
-        return l2_normalize(np.stack([self._sentence_vector(t) for t in texts]))
+            return np.zeros((0, dim), dtype=np.float32)
+        out = np.zeros((len(texts), dim), dtype=np.float32)
+        for i, t in enumerate(texts):
+            rows, weights = [], []
+            for m in re.finditer(r"[^\W\d_]+(?:'[^\W\d_]+)?", t):
+                hit = self._lookup(normalize_word(m.group()))
+                if hit:
+                    rows.append(hit[0])
+                    weights.append(hit[1])
+            if rows:
+                w = np.asarray(weights, dtype=np.float32)
+                out[i] = (w[:, None] * self._vectors[rows]).sum(axis=0) / w.sum()
+        return l2_normalize(out)
 
 
 def build_wordvec_files(directory: Path = WORDVEC_DIR) -> None:
@@ -187,8 +205,8 @@ class LexicalProvider(EmbeddingProvider):
     name = "lexical"
     label = "TF-IDF word overlap (no semantic model available)"
     degraded = True
-    paraphrase_threshold = 0.55
-    strong_threshold = 0.75
+    paraphrase_threshold = 0.51  # MRPC-calibrated (F0.5 on train)
+    strong_threshold = 0.93
     DIM = 1 << 13
 
     def encode(self, texts: list[str]) -> np.ndarray:
@@ -199,7 +217,9 @@ class LexicalProvider(EmbeddingProvider):
         for t in texts:
             stems = content_stems(t)
             feats = stems + [a + " " + b for a, b in zip(stems, stems[1:], strict=False)]
-            counts = Counter(hash(f) % self.DIM for f in feats)
+            # crc32, not hash(): Python's string hash is randomised per process,
+            # which would make results irreproducible across runs.
+            counts = Counter(zlib.crc32(f.encode()) % self.DIM for f in feats)
             docs.append(counts)
             df.update(counts.keys())
         n = len(texts)

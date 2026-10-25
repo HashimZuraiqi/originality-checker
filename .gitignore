@@ -8,6 +8,7 @@ venv/
 
 # Runtime data (documents, keys, databases) - never commit
 backend/data/
+backend/models/
 *.db
 .env
 

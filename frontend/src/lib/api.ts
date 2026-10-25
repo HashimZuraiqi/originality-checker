@@ -84,6 +84,7 @@ export type SimilarityFinding = {
   source_excerpt: string | null;
   citation_detected: boolean;
   counts_toward_index: boolean;
+  weak?: boolean;
   explanation: string;
   next_steps: string;
   evidence: Record<string, unknown> & {

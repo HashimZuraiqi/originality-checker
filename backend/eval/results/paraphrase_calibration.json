@@ -1,0 +1,83 @@
+{
+  "dataset": "MRPC train 4076 / test 1725 pairs (positive rate test 0.66)",
+  "lexical": {
+    "calibrated": {
+      "paraphrase_threshold": 0.51,
+      "strong_threshold": 0.93
+    },
+    "previous": {
+      "paraphrase_threshold": 0.47,
+      "strong_threshold": 0.86
+    },
+    "test_auc_cosine": 0.7,
+    "test_rule_calibrated": {
+      "precision": 0.768,
+      "recall": 0.697,
+      "f1": 0.731,
+      "false_positive_rate": 0.417,
+      "accuracy": 0.659
+    },
+    "test_rule_previous": {
+      "precision": 0.756,
+      "recall": 0.758,
+      "f1": 0.757,
+      "false_positive_rate": 0.486,
+      "accuracy": 0.676
+    },
+    "test_cosine_only_at_calibrated": {
+      "precision": 0.768,
+      "recall": 0.697,
+      "f1": 0.731,
+      "false_positive_rate": 0.417,
+      "accuracy": 0.659
+    }
+  },
+  "wordvec": {
+    "calibrated": {
+      "paraphrase_threshold": 0.91,
+      "strong_threshold": 0.98
+    },
+    "previous": {
+      "paraphrase_threshold": 0.91,
+      "strong_threshold": 0.98
+    },
+    "test_auc_cosine": 0.713,
+    "test_rule_calibrated": {
+      "precision": 0.773,
+      "recall": 0.716,
+      "f1": 0.743,
+      "false_positive_rate": 0.417,
+      "accuracy": 0.671
+    },
+    "test_rule_previous": {
+      "precision": 0.773,
+      "recall": 0.716,
+      "f1": 0.743,
+      "false_positive_rate": 0.417,
+      "accuracy": 0.671
+    },
+    "test_cosine_only_at_calibrated": {
+      "precision": 0.773,
+      "recall": 0.716,
+      "f1": 0.743,
+      "false_positive_rate": 0.417,
+      "accuracy": 0.671
+    }
+  },
+  "baselines": {
+    "always_paraphrase": {
+      "precision": 0.665,
+      "recall": 1.0,
+      "f1": 0.799,
+      "false_positive_rate": 1.0,
+      "accuracy": 0.665
+    },
+    "word_overlap_0.5": {
+      "precision": 0.686,
+      "recall": 0.973,
+      "f1": 0.804,
+      "false_positive_rate": 0.886,
+      "accuracy": 0.685
+    }
+  }
+}

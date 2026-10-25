@@ -119,7 +119,10 @@ class KeywordProvider(EmbeddingProvider):
         out = []
         for t in texts:
             stems = set(content_stems(t))
-            v = np.array([len(stems & {"revolution", "france", "french", "estat", "general", "brumair", "coup", "1789"}) + 0.01, len(stems & {"democracy", "liberal", "idea", "principl", "valu", "institution"}) + 0.01, 0.2])
+            # A text-dependent direction keeps unrelated sentences apart (a
+            # constant one would make every off-topic sentence identical).
+            h = sum(map(ord, t))
+            v = np.array([len(stems & {"revolution", "france", "french", "estat", "general", "brumair", "coup", "1789"}) + 0.01, len(stems & {"democracy", "liberal", "idea", "principl", "valu", "institution"}) + 0.01, 0.2 * np.cos(h), 0.2 * np.sin(h)])
             out.append(v / np.linalg.norm(v))
         return np.array(out)
 
@@ -157,3 +160,15 @@ def test_minhash_finds_near_duplicates(edit_fraction):
     assert estimate_jaccard(sa, sc) < 0.1
     groups = near_duplicate_groups([sa, sb, sc], threshold=0.6)
     assert [0, 1] in [sorted(g) for g in groups]
+
+
+def test_single_moderate_sentence_is_weak_signal_not_counted():
+    one = "The revolution in France was a time of social and political upheaval which started with the Estates General in 1789 and finished with the Brumaire coup in 1799."
+    class Moderate(KeywordProvider):
+        strong_threshold = 0.9999
+
+    _, r = run(ORIGINAL + "\n\n" + one, [SRC2], provider=Moderate())
+    sem = [f for f in r["findings"] if f["method"] == "semantic"]
+    assert sem and sem[0]["weak"] is True and sem[0]["severity"] == "info"
+    assert sem[0]["label"] == "Weak paraphrase signal"
+    assert r["scores"]["semantic_pct"] == 0 and r["scores"]["weak_semantic_pct"] > 0

@@ -58,20 +58,20 @@
   "intercept": -4.9005337605188695,
   "meta": {
     "version": "stylometric-lr-1",
-    "threshold_low": 0.4,
-    "threshold_high": 0.793,
+    "threshold_low": 0.303,
+    "threshold_high": 0.782,
     "trained_on": "476 human texts (Brown corpus, ELLIPSE learner essays, CPython docstrings) + 78 LLM-generated texts",
     "cv_metrics": {
       "n": 554,
-      "precision_many": 0.87,
-      "recall_many": 0.859,
-      "f1_many": 0.865,
+      "precision_many": 0.868,
+      "recall_many": 0.846,
+      "f1_many": 0.857,
       "false_positive_rate_many": 0.021,
-      "human_marked_few": 0.903,
-      "ai_marked_few": 0.051,
-      "inconclusive_rate": 0.078,
-      "auc": 0.982,
-      "ece": 0.075
+      "human_marked_few": 0.878,
+      "ai_marked_few": 0.064,
+      "inconclusive_rate": 0.099,
+      "auc": 0.977,
+      "ece": 0.071
     },
     "features_dropped": [
       "paragraph_uniformity",
