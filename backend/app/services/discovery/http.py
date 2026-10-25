@@ -63,6 +63,7 @@ limiter = _HostLimiter()
 @dataclass
 class CallStats:
     requests: int = 0
+    successes: int = 0
     cache_hits: int = 0
     errors: list[str] = field(default_factory=list)
     status: str = "ok"  # ok | degraded | unavailable | skipped | disabled
@@ -150,6 +151,7 @@ class ProviderClient:
 
     def _success(self) -> None:
         self._consecutive_failures = 0
+        self.stats.successes += 1
 
     def _failure(self, message: str, hard: bool = False) -> None:
         self._consecutive_failures += 2 if hard else 1

@@ -145,8 +145,15 @@ INFORMAL = [
 ]
 
 
+def _dedupe_word(m: re.Match) -> str:
+    return m.group(1)
+
+
 def _build_rules() -> list[Rule]:
-    rules: list[Rule] = []
+    rules: list[Rule] = [
+        # "the the" -> "the" ("had had" and "that that" can be correct English).
+        Rule(r"\b(?!(?:had|that)\b)(\w+) \1\b", _dedupe_word, "Remove an accidentally repeated word", ALL),
+    ]
     for pat, rep in WORDY:
         rules.append(Rule(pat, rep, "Replace a wordy phrase with a shorter equivalent", TIGHT))
     for pat, rep in CLICHES:
@@ -159,7 +166,26 @@ def _build_rules() -> list[Rule]:
         rules.append(Rule(pat, rep, "Expand the contraction for formal writing", {"academic", "professional"}))
     for pat, rep in INFORMAL:
         rules.append(Rule(pat, rep, "Replace informal wording with a formal equivalent", {"academic", "professional"}))
+    rules.append(
+        Rule(
+            r"\b(?P<art>[Aa]n? )?(?P<w>(?i:very|really|quite|extremely|totally|basically|actually|literally)) (?P<next>[a-z])",
+            _drop_intensifier,
+            "Remove an intensifier that adds little meaning (check the sentence still says what you mean)",
+            {"concise"},
+            flags=0,
+        )
+    )
     return rules
+
+
+def _drop_intensifier(m: re.Match) -> str:
+    """Drop the intensifier, fixing a/an and sentence-initial capitals."""
+    nxt = m.group("next")
+    art = m.group("art")
+    if art:
+        new_art = "an " if nxt in "aeiou" else "a "
+        return (new_art.capitalize() if art[0].isupper() else new_art) + nxt
+    return nxt.upper() if m.group("w")[0].isupper() else nxt
 
 
 RULES = _build_rules()

@@ -108,7 +108,7 @@ class CurrentUser:
         return self.user.id
 
 
-def _load_session(db: Session, request: Request) -> AuthSession | None:
+def load_session(db: Session, request: Request) -> AuthSession | None:
     token = request.cookies.get(SESSION_COOKIE)
     if not token:
         return None
@@ -125,7 +125,7 @@ def _load_session(db: Session, request: Request) -> AuthSession | None:
 
 
 def current_user(request: Request, db: Session = Depends(get_db)) -> CurrentUser:
-    session = _load_session(db, request)
+    session = load_session(db, request)
     if session is None:
         raise HTTPException(401, "Please sign in.")
     user = db.get(User, session.user_id)

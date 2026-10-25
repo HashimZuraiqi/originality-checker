@@ -14,6 +14,7 @@ from ..security import (
     destroy_session,
     dummy_verify,
     hash_password,
+    load_session,
     preferences,
     rate_limiter,
     verify_password,
@@ -65,6 +66,16 @@ def logout(request: Request, response: Response, me: CurrentUser = Depends(curre
     destroy_session(db, request, response)
     audit(db, "logout", me.id, ip=client_ip(request))
     return {"ok": True}
+
+
+@router.get("/session")
+def session_status(request: Request, db: Session = Depends(get_db)):
+    """Like /me, but answers 200 for anonymous visitors ({"authenticated": false})."""
+    session = load_session(db, request)
+    user = db.get(User, session.user_id) if session else None
+    if user is None:
+        return {"authenticated": False}
+    return {"authenticated": True, **_me(user, session.csrf_token)}
 
 
 @router.get("/me")

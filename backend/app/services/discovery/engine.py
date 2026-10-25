@@ -240,29 +240,39 @@ def discover_sources(
 
     for p in providers:
         st = p.client.stats
+        answered = st.successes + st.cache_hits
+        if not st.requests and not st.cache_hits:
+            status, detail = "not_used", "No queries were routed to this service within the query budget."
+        elif answered == 0:
+            status, detail = "unavailable", "; ".join(st.errors[:2]) or "No response"
+        else:
+            status, detail = ("degraded" if st.errors else "ok"), "; ".join(st.errors[:2])
         coverage_providers.append(
             {
                 "name": p.name,
                 "label": p.label,
-                "status": st.status if st.requests or st.cache_hits else "ok",
+                "status": status,
                 "queries": used.get(p.name, 0),
                 "requests": st.requests,
                 "cache_hits": st.cache_hits,
                 "results": per_provider_results.get(p.name, 0),
                 "errors": st.errors[:3],
-                "detail": "; ".join(st.errors[:2]) if st.errors else "",
+                "detail": detail,
             }
         )
     full = sum(1 for s in sources if s.text_kind == "full_text")
     if http_client is None:
         shared_http.close()
     reachable = [c for c in coverage_providers if c["status"] in ("ok", "degraded")]
+    n_queries = sum(c.get("queries", 0) for c in reachable)
     summary = (
-        f"Searched {len(reachable)} external services with {len(capped_plan)} queries; "
-        f"compared against {len(sources)} sources ({full} full text, {len(sources) - full} abstract/snippet only)."
+        f"Searched {len(reachable)} external service{'s' if len(reachable) != 1 else ''} with {n_queries} queries; "
+        f"compared against {len(sources)} source{'s' if len(sources) != 1 else ''} ({full} full text, {len(sources) - full} abstract/snippet only)."
     )
     if not reachable:
         summary = "No external search service could be reached, so no external sources were compared. This is a coverage gap, not a clean result."
+    elif not sources:
+        summary += " No retrievable source text was found, so external overlap could not be measured."
     return DiscoveryResult(
         sources=sources,
         coverage={

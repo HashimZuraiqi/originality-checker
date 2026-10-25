@@ -1,0 +1,16 @@
+@import "@fontsource-variable/inter";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body { font-feature-settings: "cv11", "ss01"; }
+  ::selection { background: rgb(199 210 254 / 0.8); }
+  .dark ::selection { background: rgb(67 56 202 / 0.6); }
+  :focus-visible { outline: 2px solid theme("colors.brand.500"); outline-offset: 2px; }
+  mark { color: inherit; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  }
+}
