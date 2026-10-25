@@ -1,0 +1,15 @@
+{
+  "name": "originality-checker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Self-hosted assignment turn-in and similarity (plagiarism) checker with zero dependencies.",
+  "license": "MIT",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  }
+}
