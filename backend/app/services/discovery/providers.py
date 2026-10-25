@@ -12,8 +12,9 @@ searched and the coverage statement says so.
 
 import html
 import re
-import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
+
+from defusedxml import ElementTree as ET
 
 from ...config import Settings
 from .http import ProviderClient, ProviderError

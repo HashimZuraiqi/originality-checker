@@ -1,0 +1,19 @@
+[project]
+name = "originality-checker"
+version = "2.0.0"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 140
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "BLE"]
+ignore = ["E501", "S101", "S311", "B008", "S603", "S110", "UP017"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S", "B"]
+"eval/*" = ["S", "E402"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

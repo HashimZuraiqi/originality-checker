@@ -41,9 +41,10 @@ def _keep_case(m: re.Match, rep: str) -> str:
 
 
 def _drop_opener(m: re.Match) -> str:
-    # Remove a sentence-initial phrase and capitalise the next word.
+    # Remove a sentence-initial phrase and capitalise the next word (digits,
+    # quotes and brackets are left untouched, so they are not consumed).
     nxt = m.group("next")
-    return nxt[0].upper() + nxt[1:]
+    return nxt.upper() if nxt else ""
 
 
 ALL = set(MODES)
@@ -113,8 +114,8 @@ CLICHES = [
 ]
 
 OPENERS = [
-    (r"(?:(?<=^)|(?<=\n)|(?<=[.!?]\s))(?:It is (?:important|worth|crucial) (?:to note|noting) that|It should be noted that|Needless to say,|It goes without saying that) (?P<next>\w)", "Remove an empty introductory phrase"),
-    (r"(?:(?<=^)|(?<=\n)|(?<=[.!?]\s))(?:Moreover|Furthermore|Additionally|Ultimately|Notably|Importantly), (?P<next>\w)", "Drop a formulaic transition (the logical link is already clear)"),
+    (r"(?:(?<=^)|(?<=\n)|(?<=[.!?]\s))(?:It is (?:important|worth|crucial) (?:to note|noting) that|It should be noted that|Needless to say,|It goes without saying that) (?:(?P<next>[^\W\d_])|(?=[\d\x22“(\[]))", "Remove an empty introductory phrase"),
+    (r"(?:(?<=^)|(?<=\n)|(?<=[.!?]\s))(?:Moreover|Furthermore|Additionally|Ultimately|Notably|Importantly), (?:(?P<next>[^\W\d_])|(?=[\d\x22“(\[]))", "Drop a formulaic transition (the logical link is already clear)"),
 ]
 
 CONTRACT = [

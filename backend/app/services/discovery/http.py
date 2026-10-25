@@ -117,6 +117,8 @@ class ProviderClient:
         last_error: Exception | None = None
         for attempt in range(3):
             limiter.wait(host)
+            if not self.available:  # the breaker may have opened while we waited
+                raise ProviderError(f"{self.provider} is unavailable for this analysis")
             self.stats.requests += 1
             try:
                 resp = self.client.get(url, params=params, headers=headers)

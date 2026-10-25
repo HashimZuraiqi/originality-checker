@@ -25,8 +25,6 @@ are not redistributed with this repository.
 
 import argparse
 import csv
-import io
-import zipfile
 import importlib
 import inspect
 import json
@@ -35,6 +33,7 @@ import random
 import re
 import sys
 import warnings
+import zipfile
 from pathlib import Path
 
 import numpy as np

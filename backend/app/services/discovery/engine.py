@@ -29,6 +29,15 @@ NOT_COVERED = [
 ]
 
 
+def default_http_client() -> httpx.Client:
+    settings = get_settings()
+    return httpx.Client(timeout=settings.http_timeout_s, headers={"User-Agent": settings.user_agent})
+
+
+# Replaceable factory (tests inject an httpx.MockTransport-backed client).
+http_client_factory = default_http_client
+
+
 @dataclass
 class DiscoveryResult:
     sources: list[SourceDoc]
@@ -107,7 +116,8 @@ def discover_sources(
             queries=[q.__dict__ for q in queries],
         )
 
-    shared_http = http_client or httpx.Client(timeout=settings.http_timeout_s, headers={"User-Agent": settings.user_agent})
+    owns_client = http_client is None
+    shared_http = http_client or http_client_factory()
     providers: list[Provider] = []
     for cls in PROVIDER_CLASSES:
         client = ProviderClient(cls.name, shared_http)
@@ -261,7 +271,7 @@ def discover_sources(
             }
         )
     full = sum(1 for s in sources if s.text_kind == "full_text")
-    if http_client is None:
+    if owns_client:
         shared_http.close()
     reachable = [c for c in coverage_providers if c["status"] in ("ok", "degraded")]
     n_queries = sum(c.get("queries", 0) for c in reachable)

@@ -53,7 +53,7 @@ def find_exact_passages(
     source: SourceDoc,
     k: int = 5,
     min_words: int = 8,
-    max_gap: int = 4,
+    max_gap: int = 3,
 ) -> list[Passage]:
     src_tokens = tokenize(source.text)
     if len(src_tokens) < k or not doc_index:
@@ -70,13 +70,17 @@ def find_exact_passages(
 
     # Greedy chaining along the document. A hit extends a chain when both the
     # document and source positions move forward by a similar, small step.
+    # One changed word destroys the k shingles containing it, so the next
+    # surviving shingle starts k+1 positions later: up to `max_gap` changed
+    # words means a step of at most k + max_gap.
+    step = k + max_gap
     chains: list[_Chain] = []
     open_chains: list[_Chain] = []
     for p, j in hits:
         best = None
         for c in open_chains:
             dp, dj = p - c.doc_last, j - c.src_last
-            if 0 < dp <= max_gap + 1 and 0 < dj <= max_gap + 1 and abs(dp - dj) <= max_gap:
+            if 0 < dp <= step and 0 < dj <= step and abs(dp - dj) <= max_gap:
                 if best is None or dp < p - best.doc_last:
                     best = c
         if best is not None:
@@ -86,7 +90,7 @@ def find_exact_passages(
             c = _Chain(p, p, j, j, set(range(p, p + k)))
             chains.append(c)
             open_chains.append(c)
-        open_chains = [c for c in open_chains if p - c.doc_last <= max_gap + 1]
+        open_chains = [c for c in open_chains if p - c.doc_last <= step]
 
     passages: list[Passage] = []
     for c in chains:

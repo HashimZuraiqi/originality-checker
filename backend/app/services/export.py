@@ -1,7 +1,7 @@
 """PDF and DOCX exports of reports and revised documents."""
 
 import io
-from datetime import datetime
+from datetime import UTC, datetime
 from xml.sax.saxutils import escape
 
 from docx import Document as DocxDocument
@@ -257,7 +257,7 @@ def revised_pdf(title: str, text: str) -> bytes:
     st = _styles()
     buf = io.BytesIO()
     pdf = SimpleDocTemplate(buf, pagesize=A4, leftMargin=22 * mm, rightMargin=22 * mm, topMargin=20 * mm, bottomMargin=20 * mm, title=title)
-    story = [_p(title, st["title"]), _p(f"Revised {datetime.utcnow():%Y-%m-%d}", st["small"]), Spacer(1, 8)]
+    story = [_p(title, st["title"]), _p(f"Revised {datetime.now(UTC):%Y-%m-%d}", st["small"]), Spacer(1, 8)]
     story += [_p(b.strip(), st["doc"]) for b in text.split("\n\n") if b.strip()]
     pdf.build(story)
     return buf.getvalue()

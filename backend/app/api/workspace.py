@@ -71,6 +71,7 @@ def delete_collection(cid: str, request: Request, me: CurrentUser = Depends(curr
     for d in db.scalars(select(Document).where(Document.collection_id == c.id)):
         delete_file(d.storage_key)
         db.delete(d)
+    db.flush()  # documents first; the collection row goes after
     db.delete(c)
     audit(db, "collection_delete", me.id, cid, client_ip(request))
     return Response(status_code=204)
