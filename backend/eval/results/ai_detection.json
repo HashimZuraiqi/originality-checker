@@ -1,0 +1,121 @@
+{
+  "thresholds": {
+    "low": 0.4,
+    "high": 0.793
+  },
+  "cross_validation": {
+    "all": {
+      "n": 554,
+      "precision_many": 0.87,
+      "recall_many": 0.859,
+      "f1_many": 0.865,
+      "false_positive_rate_many": 0.021,
+      "human_marked_few": 0.903,
+      "ai_marked_few": 0.051,
+      "inconclusive_rate": 0.078,
+      "auc": 0.982,
+      "ece": 0.075
+    },
+    "academic": {
+      "n": 236,
+      "precision_many": 0.808,
+      "recall_many": 0.875,
+      "f1_many": 0.84,
+      "false_positive_rate_many": 0.024,
+      "human_marked_few": 0.873,
+      "ai_marked_few": 0.0,
+      "inconclusive_rate": 0.106,
+      "auc": 0.99,
+      "ece": 0.117
+    },
+    "news": {
+      "n": 44,
+      "note": "single-class subset; only detection rate is meaningful",
+      "marked_many": 0.091,
+      "marked_few": 0.727
+    },
+    "student_essay": {
+      "n": 190,
+      "precision_many": 0.964,
+      "recall_many": 0.9,
+      "f1_many": 0.931,
+      "false_positive_rate_many": 0.006,
+      "human_marked_few": 0.956,
+      "ai_marked_few": 0.0,
+      "inconclusive_rate": 0.047,
+      "auc": 0.997,
+      "ece": 0.037
+    },
+    "technical": {
+      "n": 84,
+      "precision_many": 1.0,
+      "recall_many": 0.792,
+      "f1_many": 0.884,
+      "false_positive_rate_many": 0.0,
+      "human_marked_few": 1.0,
+      "ai_marked_few": 0.167,
+      "inconclusive_rate": 0.012,
+      "auc": 0.995,
+      "ece": 0.047
+    }
+  },
+  "non_native_by_proficiency": {
+    "lower (<2.5)": {
+      "n": 8,
+      "false_positive_rate_many": 0.0,
+      "marked_few": 1.0
+    },
+    "middle (2.5-3.5)": {
+      "n": 95,
+      "false_positive_rate_many": 0.0,
+      "marked_few": 0.979
+    },
+    "higher (>=3.5)": {
+      "n": 57,
+      "false_positive_rate_many": 0.018,
+      "marked_few": 0.912
+    }
+  },
+  "ai_student_essay_default_voice": {
+    "n": 15,
+    "recall_many": 1.0,
+    "marked_few": 0.0
+  },
+  "ai_student_essay_persona_voice": {
+    "n": 15,
+    "recall_many": 0.8,
+    "marked_few": 0.0
+  },
+  "features_dropped_by_sign_constraint": [
+    "paragraph_uniformity",
+    "oov_rate"
+  ],
+  "robustness_ai_edited": {
+    "n": 78,
+    "marked_many": 0.782,
+    "inconclusive": 0.167,
+    "marked_few": 0.051,
+    "note": "scored by the final model trained on unedited data (optimistic for in-distribution AI text)"
+  },
+  "robustness_mixed": {
+    "n": 20,
+    "marked_many": 0.1,
+    "inconclusive": 0.15,
+    "marked_few": 0.75,
+    "note": "scored by the final model trained on unedited data (optimistic for in-distribution AI text)"
+  },
+  "coefficients": {
+    "burstiness": -2.633,
+    "mean_sentence_length": -2.622,
+    "repetition": -2.077,
+    "punctuation_variety": -1.816,
+    "mtld": 1.558,
+    "commonness": 0.587,
+    "transition_opener_rate": 0.435,
+    "marker_rate": 0.222,
+    "contraction_rate": -0.178,
+    "paragraph_uniformity": 0.0,
+    "oov_rate": 0.0,
+    "emdash_rate": 0.0
+  }
+}

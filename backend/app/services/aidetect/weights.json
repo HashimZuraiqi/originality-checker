@@ -1,0 +1,112 @@
+{
+  "features": [
+    "burstiness",
+    "mean_sentence_length",
+    "mtld",
+    "commonness",
+    "marker_rate",
+    "transition_opener_rate",
+    "paragraph_uniformity",
+    "repetition",
+    "contraction_rate",
+    "oov_rate",
+    "punctuation_variety",
+    "emdash_rate"
+  ],
+  "mean": [
+    0.47294169675090253,
+    27.889075812274367,
+    4.309309524246047,
+    4.773251263537905,
+    0.1871800080813796,
+    0.008047489140733508,
+    0.5410879061371845,
+    0.06501335310879501,
+    0.43382603068091563,
+    0.014334892086341835,
+    0.14373953068592057,
+    0.0
+  ],
+  "std": [
+    0.1942486975773028,
+    25.194227102315743,
+    0.43959992059822345,
+    0.368879351501419,
+    0.5608549078834814,
+    0.02812377641692278,
+    0.16538705029743095,
+    0.07472277116543517,
+    0.4445759235578187,
+    0.023485309856361016,
+    0.1828427663098475,
+    1.0
+  ],
+  "coef": [
+    -2.6326461690998864,
+    -2.621787640486401,
+    1.5575084141492583,
+    0.5870529884839455,
+    0.222474236005989,
+    0.43469398047462066,
+    0.0,
+    -2.0771558196439615,
+    -0.17758725752913823,
+    0.0,
+    -1.8164921938286913,
+    0.0
+  ],
+  "intercept": -4.9005337605188695,
+  "meta": {
+    "version": "stylometric-lr-1",
+    "threshold_low": 0.4,
+    "threshold_high": 0.793,
+    "trained_on": "476 human texts (Brown corpus, ELLIPSE learner essays, CPython docstrings) + 78 LLM-generated texts",
+    "cv_metrics": {
+      "n": 554,
+      "precision_many": 0.87,
+      "recall_many": 0.859,
+      "f1_many": 0.865,
+      "false_positive_rate_many": 0.021,
+      "human_marked_few": 0.903,
+      "ai_marked_few": 0.051,
+      "inconclusive_rate": 0.078,
+      "auc": 0.982,
+      "ece": 0.075
+    },
+    "features_dropped": [
+      "paragraph_uniformity",
+      "oov_rate"
+    ],
+    "typical": {
+      "human": {
+        "burstiness": 0.465,
+        "mean_sentence_length": 23.375,
+        "mtld": 65.584,
+        "commonness": 4.72,
+        "marker_rate": 0.0,
+        "transition_opener_rate": 0.0,
+        "paragraph_uniformity": 0.5,
+        "repetition": 0.052,
+        "contraction_rate": 0.42,
+        "oov_rate": 0.005,
+        "punctuation_variety": 0.1,
+        "emdash_rate": 0.0
+      },
+      "ai": {
+        "burstiness": 0.295,
+        "mean_sentence_length": 20.5,
+        "mtld": 121.147,
+        "commonness": 4.656,
+        "marker_rate": 0.0,
+        "transition_opener_rate": 0.0,
+        "paragraph_uniformity": 0.5,
+        "repetition": 0.0,
+        "contraction_rate": 0.0,
+        "oov_rate": 0.0,
+        "punctuation_variety": 0.0,
+        "emdash_rate": 0.0
+      }
+    },
+    "limitations": "AI samples come from a single LLM family; human essays are from US secondary-school English learners; performance on other generators, languages and genres is unmeasured."
+  }
+}

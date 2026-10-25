@@ -1,0 +1,9 @@
+# Optional: stronger semantic similarity.
+# 1) Sentence-Transformers (best): downloads all-MiniLM-L6-v2 and a cross-encoder from Hugging Face on first use.
+#    Install a CPU build of torch first to keep the install small:
+#    pip install torch --index-url https://download.pytorch.org/whl/cpu
+sentence-transformers>=3.0
+# 2) Word vectors (no Hugging Face access needed): spaCy's medium English vectors.
+#    Converted once into backend/data/models/wordvec by `python -m app.tools.build_wordvec`.
+spacy==3.8.16
+en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl
